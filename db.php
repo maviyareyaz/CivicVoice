@@ -1,9 +1,9 @@
 <?php
-$servername = getenv("MYSQLHOST");
-$username   = getenv("MYSQLUSER");
-$password   = getenv("MYSQLPASSWORD");
-$database   = getenv("MYSQLDATABASE");
-$port       = getenv("MYSQLPORT");
+$servername = "hayabusa.proxy.rlwy.net";
+$username = "root";
+$password = "novQxtbGPgEqAEgnvPGkInDvepgRlZPA";
+$database = "railway";
+$port = 42282;
 
 $conn = new mysqli($servername, $username, $password, $database, $port);
 
