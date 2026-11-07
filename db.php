@@ -1,13 +1,33 @@
 <?php
-$servername = "hayabusa.proxy.rlwy.net";
-$username = "root";
-$password = "novQxtbGPgEqAEgnvPGkInDvepgRlZPA";
-$database = "railway";
-$port = 42282;
+$servername = getenv("gateway01.ap-southeast-1.prod.aws.tidbcloud.com");
+$username   = getenv("2qca3zj8FFuqYTR.root");
+$password   = getenv("UH9p3EVIhD1SgjSp");
+$database   = getenv("civicvoice");
+$port       = (int) getenv("4000");
 
-$conn = new mysqli($servername, $username, $password, $database, $port);
+$caPath = __DIR__ . "/isrgrootx1.pem";
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+$conn = mysqli_init();
+
+$conn->ssl_set(
+    NULL,
+    NULL,
+    $caPath,
+    NULL,
+    NULL
+);
+
+if (!$conn->real_connect(
+    $servername,
+    $username,
+    $password,
+    $database,
+    $port,
+    NULL,
+    MYSQLI_CLIENT_SSL
+)) {
+    die("Database connection failed.");
 }
+
+$conn->set_charset("utf8mb4");
 ?>
