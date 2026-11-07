@@ -5,45 +5,73 @@ if ($_SERVER["REQUEST_METHOD"] != "POST") {
     exit;
 }
 
-if (
-    empty($_POST['title']) ||
-    empty($_POST['description']) ||
-    empty($_POST['category']) ||
-    empty($_POST['location'])
-) {
-    exit;
+$title = $_POST['title'] ?? '';
+$description = $_POST['description'] ?? '';
+$category = $_POST['category'] ?? '';
+$location = $_POST['location'] ?? '';
+$severity = $_POST['severity'] ?? 'Medium';
+$reporter = $_POST['reporter'] ?? '';
+
+if (!$title || !$description || !$category || !$location) {
+    exit("Missing required fields");
 }
 
-$title = $_POST['title'];
-$description = $_POST['description'];
-$category = $_POST['category'];
-$location = $_POST['location'];
-$severity = $_POST['severity'];
-$reporter = $_POST['reporter'];
+// Generate next ID because TiDB column has no AUTO_INCREMENT
+$result = $conn->query(
+    "SELECT COALESCE(MAX(id), 0) + 1 AS next_id FROM issues"
+);
+
+if (!$result) {
+    exit("ID generation failed: " . $conn->error);
+}
+
+$id = (int)$result->fetch_assoc()['next_id'];
+
 $image = "";
 
 if (isset($_FILES["image"]) && $_FILES["image"]["error"] == 0) {
-
     $imageName = time() . "_" . basename($_FILES["image"]["name"]);
 
-    move_uploaded_file(
+    if (move_uploaded_file(
         $_FILES["image"]["tmp_name"],
         "uploads/" . $imageName
-    );
-
-    $image = "uploads/" . $imageName;
+    )) {
+        $image = "uploads/" . $imageName;
+    }
 }
+
 $votes = 0;
 $status = "reported";
-$time = round(microtime(true) * 1000);
-$sql = "INSERT INTO issues (title, description, category, location, severity, reporter, image, votes, status , time )
-VALUES ('$title', '$description', '$category', '$location', '$severity', '$reporter', '$image', '$votes', '$status', '$time' )";
+$time = (int)round(microtime(true) * 1000);
 
-if ($conn->query($sql) === TRUE) {
+$stmt = $conn->prepare(
+    "INSERT INTO issues
+    (id, title, description, category, location, severity,
+    reporter, image, votes, status, time)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+);
+
+$stmt->bind_param(
+    "isssssssisi",
+    $id,
+    $title,
+    $description,
+    $category,
+    $location,
+    $severity,
+    $reporter,
+    $image,
+    $votes,
+    $status,
+    $time
+);
+
+if ($stmt->execute()) {
     echo "success";
 } else {
-    echo "Error: " . $conn->error;
+    echo "Error: " . $stmt->error;
 }
 
+$stmt->close();
 $conn->close();
 ?>
