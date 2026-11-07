@@ -1,11 +1,12 @@
 <?php
-$servername = getenv("gateway01.ap-southeast-1.prod.aws.tidbcloud.com");
-$username   = getenv("2qca3zj8FFuqYTR.root");
-$password   = getenv("UH9p3EVIhD1SgjSp");
-$database   = getenv("civicvoice");
-$port       = (int) getenv("4000");
 
-"/etc/ssl/certs/ca-certificates.crt"
+$servername = getenv("DB_HOST");
+$username   = getenv("DB_USER");
+$password   = getenv("DB_PASSWORD");
+$database   = getenv("DB_NAME");
+$port       = (int)getenv("DB_PORT");
+
+$caPath = "/etc/ssl/certs/ca-certificates.crt";
 
 $conn = mysqli_init();
 
