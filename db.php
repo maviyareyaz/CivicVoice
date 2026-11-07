@@ -5,7 +5,7 @@ $password   = getenv("UH9p3EVIhD1SgjSp");
 $database   = getenv("civicvoice");
 $port       = (int) getenv("4000");
 
-$caPath = __DIR__ . "/isrgrootx1.pem";
+"/etc/ssl/certs/ca-certificates.crt"
 
 $conn = mysqli_init();
 
